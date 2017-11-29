@@ -11,8 +11,32 @@ var init_data = [
         ];
 
 var Location = function(data){
+   self = this ;
    this.title = ko.observable(data.title);
-   this.location = ko.observable(data.location)
+   this.location = ko.observable(data.location);
+
+       // load wikipedia data
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + this.title() + '&format=json&callback=wikiCallback';
+    var wikiRequestTimeout = setTimeout(function(){
+         self.url = ko.observable("failed to get wikipedia resources");
+    }, 8000);
+
+    $.ajax({
+        url: wikiUrl,
+        dataType: "jsonp",
+        jsonp: "callback",
+        success: function( response ) {
+            var articleList = response[1];
+
+            for (var i = 0; i < articleList.length; i++) {
+                articleStr = articleList[i];
+                self.url = ko.observable('http://en.wikipedia.org/wiki/' + articleStr);
+            };
+            clearTimeout(wikiRequestTimeout);
+        }
+    });
+
+
 
 }
 
@@ -33,6 +57,10 @@ var init = function() {
      var highlightedIcon = makeMarkerIcon('FFFF24');
 
      var largeInfowindow = new google.maps.InfoWindow();
+
+
+
+     console.log(markers);
      // The following group uses the location array to create an array of markers on initialize.
      for (var i = 0; i < init_data.length; i++) {
        // Get the position from the location array.
