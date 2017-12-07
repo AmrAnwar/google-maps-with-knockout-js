@@ -2,53 +2,26 @@ var map;
 var markers = [];
 
 var init_data = [
-          {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
-          {title: 'Chelsea Loft', location: {lat: 40.7444883, lng: -73.9949465}},
-          {title: 'Union Square Open Floor Plan', location: {lat: 40.7347062, lng: -73.9895759}},
-          {title: 'East Village Hip Studio', location: {lat: 40.7281777, lng: -73.984377}},
-          {title: 'TriBeCa Artsy Bachelor Pad', location: {lat: 40.7195264, lng: -74.0089934}},
-          {title: 'Chinatown Homey Space', location: {lat: 40.7180628, lng: -73.9961237}}
+          {title: 'Union Square', location: {lat: 40.7347062, lng: -73.9895759}},
+          {title: 'East Village', location: {lat: 40.7281777, lng: -73.984377}},
+          {title: 'TriBeCa', location: {lat: 40.7195264, lng: -74.0089934}},
+          {title: 'Chinatown', location: {lat: 40.7180628, lng: -73.9961237}}
         ];
 
-var Location = function(data){
-   self = this ;
+var Loction = function(data){
    this.title = ko.observable(data.title);
    this.location = ko.observable(data.location);
-
-       // load wikipedia data
-    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + this.title() + '&format=json&callback=wikiCallback';
-    var wikiRequestTimeout = setTimeout(function(){
-         self.url = ko.observable("failed to get wikipedia resources");
-    }, 8000);
-
-    $.ajax({
-        url: wikiUrl,
-        dataType: "jsonp",
-        jsonp: "callback",
-        success: function( response ) {
-            var articleList = response[1];
-
-            for (var i = 0; i < articleList.length; i++) {
-                articleStr = articleList[i];
-                self.url = ko.observable('http://en.wikipedia.org/wiki/' + articleStr);
-            };
-            clearTimeout(wikiRequestTimeout);
-        }
-    });
-
-
-
+   this.marker = data.marker;
 }
 
 var init = function() {
         // Constructor creates a new map - only center and zoom are required.
       map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 40.7413549, lng: -73.9980244},
-          zoom: 13
+          zoom: 10
       
       });
 
-      ////
 
       var largeInfowindow = new google.maps.InfoWindow();
 
@@ -58,9 +31,6 @@ var init = function() {
 
      var largeInfowindow = new google.maps.InfoWindow();
 
-
-
-     console.log(markers);
      // The following group uses the location array to create an array of markers on initialize.
      for (var i = 0; i < init_data.length; i++) {
        // Get the position from the location array.
@@ -69,7 +39,7 @@ var init = function() {
        // Create a marker per location, and put into markers array.
        var marker = new google.maps.Marker({
          position: position,
-         map: map,
+         // map: map,
          title: title,
          animation: google.maps.Animation.DROP,
          id: i
@@ -77,9 +47,10 @@ var init = function() {
        });
        // Push the marker to our array of markers.
        markers.push(marker);
-
+       init_data[i].marker = marker ; 
        // Create an onclick event to open the large infowindow at each marker.
        marker.addListener('click', function() {
+
          populateInfoWindow(this, largeInfowindow);
        });
        // Two event listeners - one for mouseover, one for mouseout,
@@ -93,6 +64,8 @@ var init = function() {
 
    /////
    }
+   showListings()
+   ko.applyBindings(new ViewModel());
 
 }
 
@@ -118,14 +91,39 @@ function populateInfoWindow(marker, infowindow) {
         // Check to make sure the infowindow is not already opened on this marker.
         if (infowindow.marker != marker) {
           infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>');
-          infowindow.open(map, marker);
+          // get wiki url 
+        
+        var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&format=json&callback=wikiCallback';
+        var wikiRequestTimeout = setTimeout(function(){
+            url = "failed to get wikipedia resources";
+        }, 8000);
+
+        $.ajax({
+            url: wikiUrl,
+            dataType: "jsonp",
+            jsonp: "callback",
+            success: function( response ) {
+                var article = response[1][0];
+                url = ('http://en.wikipedia.org/wiki/' + article);
+                clearTimeout(wikiRequestTimeout);
+                // put data
+
+                infowindow.setContent('<div> <a href="' + url + '">' + marker.title + '</a></div>');
+                infowindow.open(map, marker);
+
+      
+            }
+        }); 
+        
+
           // Make sure the marker property is cleared if the infowindow is closed.
           infowindow.addListener('closeclick', function() {
             infowindow.marker = null;
           });
         }
       }
+
+
 
 // This function takes in a COLOR, and then creates a new marker
 // icon of that color. The icon will be 21 px wide by 34 high, have an origin
@@ -143,14 +141,42 @@ function makeMarkerIcon(markerColor) {
 
 var ViewModel = function() {
         // Constructor creates a new map - only center and zoom are required.
-      self = this;
-      this.locations = ko.observableArray([]);
-      init_data.forEach(function(location){
-         self.locations.push(new Location(location));
-      });
-      
+      var self = this;
 
+      this.filter_data = function(){
+          // refresh data          
+          self.locations.removeAll();
+          showListings();
+
+          if (self.filter()){
+            // if the user intered data in the input field , loop through the data
+            for ( var i =0 ; i < init_data.length; i++){
+
+              // remove marker from map if not match
+              if ( ! init_data[i].title.toLowerCase().includes(this.filter().toLowerCase())){
+                  init_data[i].marker.setMap(null);
+              }
+              else{
+                // add to the list 
+                self.locations.push(new Loction(init_data[i]));
+              }
+            }
+          }
+          else{ // if there are no filter put the entire init_data
+            ko_data(self.locations);
+          }
+
+      };
+      this.filter = ko.observable();
+      this.locations = ko.observableArray([]);
+      
+      ko_data(this.locations);
 }
 
-
-ko.applyBindings(new ViewModel());
+// enter the init_data to empty observableArray 
+function ko_data(ko_locations){
+      ko_locations.removeAll();
+      init_data.forEach(function(location){
+         ko_locations.push(new Loction(location));
+      });
+}

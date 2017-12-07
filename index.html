@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
     <style>
       html,
       body {
@@ -26,10 +29,6 @@
         text-align: center;
       }
 
-      #hide-listings,
-      #show-listings {
-        width: 48%;
-      }
 
       hr {
         background: #D0D7D9;
@@ -57,55 +56,33 @@
         width: 340px;
       }
 
-      #pano {
-        width: 200px;
-        height: 200px;
-      }
-
-      .text {
-        font-size: 12px;
-      }
-
-      #toggle-drawing {
-        width: 27%;
-        position: relative;
-        margin-left: 10px;
-      }
-
-      #zoom-to-area-text {
+      #filter-text {
         position: relative;
         width: 70%;
       }
 
-      #zoom-to-area {
+      #filter {
         width: 24%;
       }
     </style>
   </head>
   <body>
+
     <div class="container">
       <div class="options-box">
         <div>
-          <input id="show-listings" type="button" value="Show Listings">
-          <input id="hide-listings" type="button" value="Hide Listings">
-          <hr>
-          <span class="text"> Draw a shape to search within it for homes!</span>
-          <input id="toggle-drawing"  type="button" value="Drawing Tools">
-        </div>
-        <hr>
-        <div>
-          <input id="zoom-to-area-text" type="text" placeholder="Enter your favorite area!">
-          <input id="zoom-to-area" type="button" value="Zoom">
+          
+          <input id="filter-text"  data-bind = "value: filter, click: filter_data"  placeholder="Enter your area">
+          <input id="filter"  data-bind = "click: filter_data" type="button" value="filter">
 
         </div>
-       
         <div data-bind = "foreach: locations">
             <h3 data-bind= "text: title"></h3>
         </div>
       </div>
       <div id="map"></div>
     </div>
-        <script async defer
+    <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=&v=3&callback=init">
     
     </script>
