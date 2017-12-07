@@ -1,12 +1,15 @@
 var map;
 var markers = [];
-
+var largeInfowindow;
 var init_data = [
+          {title: 'Park Ave', location: {lat: 40.7713024, lng: -73.9632393}},
+          {title: 'Chelsea', location: {lat: 40.7444883, lng: -73.9949465}},
           {title: 'Union Square', location: {lat: 40.7347062, lng: -73.9895759}},
           {title: 'East Village', location: {lat: 40.7281777, lng: -73.984377}},
           {title: 'TriBeCa', location: {lat: 40.7195264, lng: -74.0089934}},
           {title: 'Chinatown', location: {lat: 40.7180628, lng: -73.9961237}}
         ];
+
 
 var Loction = function(data){
    this.title = ko.observable(data.title);
@@ -23,13 +26,13 @@ var init = function() {
       });
 
 
-      var largeInfowindow = new google.maps.InfoWindow();
+      largeInfowindow = new google.maps.InfoWindow();
 
      // Create a "highlighted location" marker color for when the user
      // mouses over the marker.
      var highlightedIcon = makeMarkerIcon('FFFF24');
 
-     var largeInfowindow = new google.maps.InfoWindow();
+     largeInfowindow = new google.maps.InfoWindow();
 
      // The following group uses the location array to create an array of markers on initialize.
      for (var i = 0; i < init_data.length; i++) {
@@ -91,8 +94,7 @@ function populateInfoWindow(marker, infowindow) {
         // Check to make sure the infowindow is not already opened on this marker.
         if (infowindow.marker != marker) {
           infowindow.marker = marker;
-          // get wiki url 
-        
+          // get wiki  api url 
         var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&format=json&callback=wikiCallback';
         var wikiRequestTimeout = setTimeout(function(){
             url = "failed to get wikipedia resources";
@@ -107,15 +109,11 @@ function populateInfoWindow(marker, infowindow) {
                 url = ('http://en.wikipedia.org/wiki/' + article);
                 clearTimeout(wikiRequestTimeout);
                 // put data
-
-                infowindow.setContent('<div> <a href="' + url + '">' + marker.title + '</a></div>');
+                infowindow.setContent('<br><div> <a href="' + url + '">' + marker.title + '</a></div>');
                 infowindow.open(map, marker);
-
-      
             }
         }); 
         
-
           // Make sure the marker property is cleared if the infowindow is closed.
           infowindow.addListener('closeclick', function() {
             infowindow.marker = null;
@@ -169,9 +167,16 @@ var ViewModel = function() {
       };
       this.filter = ko.observable();
       this.locations = ko.observableArray([]);
-      
       ko_data(this.locations);
+      
+      // when click in name in the list open info window
+      this.get_info_window = function () {
+        console.log(largeInfowindow);
+        populateInfoWindow(this.marker, largeInfowindow);
+
+      }
 }
+
 
 // enter the init_data to empty observableArray 
 function ko_data(ko_locations){

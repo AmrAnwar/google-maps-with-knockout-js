@@ -76,8 +76,8 @@
           <input id="filter"  data-bind = "click: filter_data" type="button" value="filter">
 
         </div>
-        <div data-bind = "foreach: locations">
-            <h3 data-bind= "text: title"></h3>
+        <div class="list-group" data-bind = "foreach: locations">
+            <a class="list-group-item" data-bind= "text: title, click: $parent.get_info_window"></a>
         </div>
       </div>
       <div id="map"></div>
