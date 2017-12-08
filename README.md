@@ -6,8 +6,13 @@
 application featuring a map of your neighborhood  or a neighborhood you would like to visit. with highlighted locations, third-party data about those locations and various ways to browse the content.
 
 
+## open the project :
+open ``` index.html ```
+
 ## I've used :
-**html , css, bootstrap3,  js, Knockout js, wiki api **
+
+html , css, bootstrap3,  js, Knockout js, wiki api 
+
 
 
 

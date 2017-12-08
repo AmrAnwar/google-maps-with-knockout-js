@@ -25,13 +25,7 @@ var init = function() {
       
       });
 
-
       largeInfowindow = new google.maps.InfoWindow();
-
-     // Create a "highlighted location" marker color for when the user
-     // mouses over the marker.
-     var highlightedIcon = makeMarkerIcon('FFFF24');
-
      largeInfowindow = new google.maps.InfoWindow();
 
      // The following group uses the location array to create an array of markers on initialize.
@@ -47,30 +41,31 @@ var init = function() {
          animation: google.maps.Animation.DROP,
          id: i
 
-       });
+       }
+
+       );
        // Push the marker to our array of markers.
        markers.push(marker);
        init_data[i].marker = marker ; 
        // Create an onclick event to open the large infowindow at each marker.
        marker.addListener('click', function() {
-
+         toggle_animation(this);
          populateInfoWindow(this, largeInfowindow);
        });
-       // Two event listeners - one for mouseover, one for mouseout,
-       // to change the colors back and forth.
-       marker.addListener('mouseover', function() {
-         this.setIcon(highlightedIcon);
-       });
-       marker.addListener('mouseout', function() {
-         this.setIcon(null);
-       });
 
-   /////
    }
    showListings()
    ko.applyBindings(new ViewModel());
 
 }
+
+function toggle_animation(marker) {
+        if (marker.getAnimation() !== null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
+      }
 
 // This function will loop through the markers array and display them all.
 function showListings() {
@@ -96,10 +91,6 @@ function populateInfoWindow(marker, infowindow) {
           infowindow.marker = marker;
           // get wiki  api url 
         var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&format=json&callback=wikiCallback';
-        var wikiRequestTimeout = setTimeout(function(){
-            url = "failed to get wikipedia resources";
-        }, 8000);
-
         $.ajax({
             url: wikiUrl,
             dataType: "jsonp",
@@ -107,11 +98,15 @@ function populateInfoWindow(marker, infowindow) {
             success: function( response ) {
                 var article = response[1][0];
                 url = ('http://en.wikipedia.org/wiki/' + article);
-                clearTimeout(wikiRequestTimeout);
                 // put data
                 infowindow.setContent('<br><div> <a href="' + url + '">' + marker.title + '</a></div>');
                 infowindow.open(map, marker);
-            }
+            },
+            error: function(response){
+                infowindow.setContent('<br><div>' + marker.title + 'error happen while getting data from wiki</div>');
+                infowindow.open(map, marker);
+        }
+
         }); 
         
           // Make sure the marker property is cleared if the infowindow is closed.
@@ -173,6 +168,8 @@ var ViewModel = function() {
       this.get_info_window = function () {
         console.log(largeInfowindow);
         populateInfoWindow(this.marker, largeInfowindow);
+        toggle_animation(this.marker);
+
 
       }
 }
