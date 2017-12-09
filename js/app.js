@@ -49,7 +49,7 @@ var init = function() {
        init_data[i].marker = marker ; 
        // Create an onclick event to open the large infowindow at each marker.
        marker.addListener('click', function() {
-          populateInfoWindow(this, largeInfowindow);
+         populateInfoWindow(this, largeInfowindow);
          toggle_animation(this);
        });
 
