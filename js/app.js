@@ -49,8 +49,8 @@ var init = function() {
        init_data[i].marker = marker ; 
        // Create an onclick event to open the large infowindow at each marker.
        marker.addListener('click', function() {
+          populateInfoWindow(this, largeInfowindow);
          toggle_animation(this);
-         populateInfoWindow(this, largeInfowindow);
        });
 
    }
@@ -60,11 +60,11 @@ var init = function() {
 }
 
 function toggle_animation(marker) {
-        if (marker.getAnimation() !== null) {
-          marker.setAnimation(null);
-        } else {
           marker.setAnimation(google.maps.Animation.BOUNCE);
-        }
+        setTimeout(function () {
+        marker.setAnimation(null);
+        }, 700)();
+
       }
 
 // This function will loop through the markers array and display them all.
@@ -94,20 +94,18 @@ function populateInfoWindow(marker, infowindow) {
         $.ajax({
             url: wikiUrl,
             dataType: "jsonp",
-            jsonp: "callback",
-            success: function( response ) {
+            jsonp: "callback",})
+            .done(function(response) {
                 var article = response[1][0];
                 url = ('http://en.wikipedia.org/wiki/' + article);
                 // put data
                 infowindow.setContent('<br><div> <a href="' + url + '">' + marker.title + '</a></div>');
-                infowindow.open(map, marker);
-            },
-            error: function(response){
-                infowindow.setContent('<br><div>' + marker.title + 'error happen while getting data from wiki</div>');
-                infowindow.open(map, marker);
-        }
+                infowindow.open(map, marker);              })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+              alert(xhr.responseJSON.Message);
 
-        }); 
+            })
+
         
           // Make sure the marker property is cleared if the infowindow is closed.
           infowindow.addListener('closeclick', function() {
@@ -135,7 +133,10 @@ function makeMarkerIcon(markerColor) {
 var ViewModel = function() {
         // Constructor creates a new map - only center and zoom are required.
       var self = this;
-
+      this.visibleFilter = ko.observable(false);      
+      this.clickFilter = function() {      
+        self.visibleFilter(!self.visibleFilter());
+      };    
       this.filter_data = function(){
           // refresh data          
           self.locations.removeAll();
@@ -166,7 +167,6 @@ var ViewModel = function() {
       
       // when click in name in the list open info window
       this.get_info_window = function () {
-        console.log(largeInfowindow);
         populateInfoWindow(this.marker, largeInfowindow);
         toggle_animation(this.marker);
 
@@ -182,3 +182,7 @@ function ko_data(ko_locations){
          ko_locations.push(new Loction(location));
       });
 }
+
+mapError = () => {
+  alert("error load map please refresh the page to try again");
+};

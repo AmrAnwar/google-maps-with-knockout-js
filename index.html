@@ -11,7 +11,9 @@
   <body>
 
     <div class="container">
-      <div class="options-box">
+      <br>
+      <button data-bind="click: clickFilter" class="btn">Filter</button>    
+      <div data-bind="visible: visibleFilter" class="options-box">
         <div>
           
           <input id="filter-text"  data-bind = "value: filter, click: filter_data"  placeholder="Enter your area">
@@ -22,7 +24,7 @@
             <a class="list-group-item" data-bind= "text: title, click: $parent.get_info_window"></a>
         </div>
       </div>
-      <div id="map"></div>
+      <div  id="map"></div>
     </div>
     <script>
       window.gm_authFailure = function() {
@@ -39,8 +41,9 @@
 
 
 
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=&v=3&callback=init">
+    <script 
+        src="https://maps.googleapis.com/maps/api/js?key=&v=3&callback=init"
+            async defer onerror="mapError()">
     
     </script>
 
