@@ -63,7 +63,7 @@ function toggle_animation(marker) {
           marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function () {
         marker.setAnimation(null);
-        }, 700)();
+        }, 700);
 
       }
 

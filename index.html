@@ -12,19 +12,21 @@
 
     <div class="container">
       <br>
-      <button data-bind="click: clickFilter" class="btn">Markers</button>    
+      <button data-bind="click: clickFilter" class="btn btn-info">Markers</button>    
       <div data-bind="visible: visibleFilter" class="options-box">
         <div>
           
-          <input id="filter-text"  data-bind = "value: filter, click: filter_data"  placeholder="Enter your area">
-          <input id="filter"  data-bind = "click: filter_data" type="button" value="filter">
-
-        </div>
+          <input  class="col-xs-12" id="filter-text"  data-bind = "value: filter, click: filter_data"  placeholder="Enter Area">
+          <input class = "btn btn-success" id="filter"  data-bind = "click: filter_data" type="button" value="filter">
+        
         <div class="list-group" data-bind = "foreach: locations">
             <a class="list-group-item" data-bind= "text: title, click: $parent.get_info_window"></a>
         </div>
+
+        </div>
+
       </div>
-      <div  id="map"></div>
+      <div id="map"></div>
     </div>
     <script>
       window.gm_authFailure = function() {
@@ -34,7 +36,7 @@
 
     </script>
 
-    <script src="js/lib/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="js/lib/knockout-3.2.0.js"></script>
     <script src="js/app.js"></script>
 

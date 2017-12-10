@@ -33,7 +33,7 @@ hr {
 #map {
   bottom:0px;
   height: 100%;
-  left: 40vw;
+  left: 45vw;
   position: absolute;
   right: 0px;
 }
@@ -46,19 +46,5 @@ hr {
   line-height: 35px;
   padding: 10px 10px 30px 10px;
   text-align: left;
-  width: 37vw;
-}
-
-.btn {
-  width: 37vw;
-
-  
-}
-#filter-text {
-  position: relative;
-  width: 70%;
-}
-
-#filter {
-  width: 24%;
+  width: 38vw;
 }
