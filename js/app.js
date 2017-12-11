@@ -100,11 +100,15 @@ function populateInfoWindow(marker, infowindow) {
                 url = ('http://en.wikipedia.org/wiki/' + article);
                 // put data
                 infowindow.setContent('<br><div> <a href="' + url + '">' + marker.title + '</a></div>');
-                infowindow.open(map, marker);              })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-              alert(xhr.responseJSON.Message);
+                infowindow.open(map, marker);              
 
-            })
+              })
+            .fail(function() {
+                // put data
+                infowindow.setContent('<br><div> N0 Data For this Location</div>');
+                infowindow.open(map, marker); 
+
+                            })
 
         
           // Make sure the marker property is cleared if the infowindow is closed.
